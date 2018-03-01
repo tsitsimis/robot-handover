@@ -453,14 +453,20 @@ def euler2matrix(theta):
     return R
 
 
-def pos2tf(t, theta):
+def posor2tf(t, theta):
+    """
+    position and orientation to transformation matrix
+    """
     r = euler2matrix(theta)
     tf = np.concatenate((r, t), axis=1)
     tf = np.concatenate((tf, R0001), axis=0)
     return tf
 
 
-def pos2tf2(pose):
+def pose2tf(pose):
+    """
+    almath pose to transformation matrix
+    """
     pose = np.array(pose)
     t = pose[0:3]
     theta = pose[3:6]

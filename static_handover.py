@@ -38,7 +38,7 @@ while True:
         features = cx, cy, orientation, width, height = utils.contour_features(contour)
         features = np.array(features)
         score = utils.detection_score(contour, width, height, contours)
-        history, is_steady, sx, sy = utils.is_object_steady(nao.history, cx, cy)
+        # history, is_steady, sx, sy = utils.is_object_steady(nao.history, cx, cy)
 
         if nao.grasped_it:
             break
@@ -59,7 +59,7 @@ while True:
         if score >= 0.9:
             x = features
             x = np.reshape(x, (1, -1))
-            y_pred = clf.predict(x)         # predict grasping quality
+            y_pred = clf.predict(x)         # predict handover quality
 
             if y_pred == 0:                 # bad handover
                 color = (0, 0, 255)
@@ -73,8 +73,7 @@ while True:
                 nao.open_hand(close=True)
                 nao.grasped_it = True
 
-        # color = (255, 255, 0)
-        cv2.drawContours(frame, [box], 0, color, 2)  # draw detected object bounding box
+        cv2.drawContours(frame, [box], 0, color, 2)  # draw the bounding box of the detected object
         cv2.circle(frame, (cx, cy), 5, color, thickness=3)
         cv2.putText(frame, text, (np.int(cx), np.int(cy)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, color, 2)
 

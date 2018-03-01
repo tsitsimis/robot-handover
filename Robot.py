@@ -4,6 +4,7 @@ import almath
 from RobotConstants import *
 import Queue
 import Image
+import utils
 
 
 class Robot:
@@ -15,14 +16,27 @@ class Robot:
         self.posture_proxy = ALProxy("ALRobotPosture", ip, port)
         self.video_proxy = ALProxy("ALVideoDevice", ip, port)
         self.subscriber = None
-
         self.frame = None
 
         self.grasped_it = False
         self.cnt_grasp = 0
         self.score_vals = np.zeros(1)
         self.predictions = np.zeros(5)
-        self.history = Queue.Queue(maxsize=5)
+        # self.history = Queue.Queue(maxsize=5)
+
+        # head and hand position/orientation for visual servo
+        # and end-effector adaptation
+        self.head_pose = None
+        self.head_pos0 = None
+        self.head_rot = None
+        self.head_transform0 = None
+        self.head_transform1 = None
+
+        self.hand_pos0 = None
+        self.hand_rot = None
+        self.hand_transform0 = None
+
+        self.arm_pose = None
 
     def init_camera(self):
         """
@@ -53,10 +67,18 @@ class Robot:
         """
         Fixes head orientation to see from the bottom camera
         """
+        self.motion_proxy.setStiffnesses(["Head"], 1)
         self.motion_proxy.setPosition(HEAD,
                                       motion.FRAME_TORSO,
                                       [0, 0, 0, 0, 20 * almath.TO_RAD, 0],
                                       0.5, AXIS_MASK_ALL)
+
+        # for interactive handover
+        self.head_pose = self.motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
+        self.head_pos0 = np.array([[self.head_pose[0]], [self.head_pose[1]], [self.head_pose[2]]])
+        self.head_rot = np.array([0, 20, 0]) * almath.TO_RAD
+        self.head_transform0 = utils.posor2tf(self.head_pos0, self.head_rot)
+        self.head_transform1 = self.head_transform0
 
     def init_arm(self):
         """
@@ -67,6 +89,11 @@ class Robot:
                                       list(np.concatenate((INIT_HAND_POS.flatten(), INIT_HAND_ROT))),
                                       0.5, AXIS_MASK_ALL)
         self.open_hand()
+
+        # for interactive handover
+        self.hand_pos0 = INIT_HAND_POS
+        self.hand_rot = INIT_HAND_ROT
+        self.hand_transform0 = utils.posor2tf(self.hand_pos0, self.hand_rot)
 
     def open_hand(self, close=False):
         """
@@ -88,25 +115,3 @@ class Robot:
         frame = Image.frombytes("RGB", (image_width, image_height), array)
         frame = np.array(frame)
         return frame
-
-
-
-
-
-
-
-
-        # def init_arm(self):
-        #     head_pose = self.motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
-        #     head_pos0 = np.array([[head_pose[0]], [head_pose[1]], [head_pose[2]]])
-        #     head_rot = np.array([0, 20, 0]) * almath.TO_RAD
-        #     head_transform0 = uu.pos2tf(head_pos0, head_rot)
-        #     head_transform1 = head_transform0
-        #
-        #     hand_pos0 = INIT_HAND_POS
-        #     hand_rot = INIT_HAND_ROT
-        #     hand_transform0 = uu.pos2tf(hand_pos0, hand_rot)
-        #
-        #     init_head(self.motion_proxy)  # move head
-        #     init_arm2(self.motion_proxy)  # move arm
-        #     self.motion_proxy.setAngles(R_HAND, HAND_OPEN, 0.2)  # open hand

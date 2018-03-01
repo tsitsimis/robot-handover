@@ -22,12 +22,12 @@ pose_head = motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
 
 t_h0 = np.array([[pose_head[0]], [pose_head[1]], [pose_head[2]]])  # set initial head + end-effector transform
 theta_h = np.array([0, 20, 0]) * almath.TO_RAD
-T_h0 = pos2tf(t_h0, theta_h)
+T_h0 = posor2tf(t_h0, theta_h)
 T_h1 = T_h0
 
 t_e0 = INIT_HAND_POS
 theta_e = INIT_HAND_ROT
-T_e0 = pos2tf(t_e0, theta_e)
+T_e0 = posor2tf(t_e0, theta_e)
 
 init_head(motion_proxy)  # move head
 init_arm2(motion_proxy)  # move arm
@@ -36,8 +36,8 @@ motion_proxy.setAngles(R_HAND, HAND_OPEN, 0.2)  # open hand
 #############
 pose_head = motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
 pose_arm = motion_proxy.getPosition(R_ARM, motion.FRAME_TORSO, True)
-tf_head = pos2tf2(pose_head)
-tf_arm = pos2tf2(pose_arm)
+tf_head = pose2tf(pose_head)
+tf_arm = pose2tf(pose_arm)
 # print np.dot(np.linalg.inv(tf_head), tf_arm)
 #############
 
@@ -59,7 +59,7 @@ time.sleep(5)
 head_yaw = 5 * almath.TO_RAD
 head_pitch = 20 * almath.TO_RAD
 theta_h1 = np.array([0, head_pitch, head_yaw])
-T_h1 = pos2tf(t_h0, theta_h1)
+T_h1 = posor2tf(t_h0, theta_h1)
 set_tf(motion_proxy, HEAD, flat_tf(T_h1))
 exit()
 time.sleep(5)
@@ -67,7 +67,7 @@ time.sleep(5)
 head_yaw = motion_proxy.getAngles(HEAD_YAW, True)[0]
 head_pitch = motion_proxy.getAngles(HEAD_PITCH, True)[0]
 theta_h1 = np.array([0, head_pitch, head_yaw])
-T_h1 = pos2tf(t_h0, theta_h1)
+T_h1 = posor2tf(t_h0, theta_h1)
 T_e1 = np.dot(np.dot(T_h1, np.linalg.inv(T_h0)), T_e0)
 set_tf(motion_proxy, R_ARM, flat_tf(T_e1))
 exit()

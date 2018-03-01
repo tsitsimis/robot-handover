@@ -1,5 +1,7 @@
 import numpy as np
+from naoqi import ALProxy, motion
 from Robot import Robot
+from RobotConstants import *
 from Classifier import Classifier
 import time
 import cv2
@@ -17,12 +19,17 @@ clf.fit()
 ip_local = "192.168.1.18"
 ip_external = "192.168.0.121"
 nao = Robot(ip=ip_external, port=9559)
-nao.crouch()
+# nao.crouch()
 nao.init_head()
-nao.init_arm()
+# nao.init_arm()
 nao.init_camera()
+time.sleep(5)
 
-time.sleep(0)
+nao.pose_head = nao.motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
+nao.arm_pose = nao.motion_proxy.getPosition(R_ARM, motion.FRAME_TORSO, True)
+tf_head = utils.pose2tf(nao.head_pose)
+tf_arm = utils.pose2tf(nao.arm_pose)
+tol = 0.85
 
 # main loop
 while True:
@@ -38,13 +45,42 @@ while True:
         features = cx, cy, orientation, width, height = utils.contour_features(contour)
         features = np.array(features)
         score = utils.detection_score(contour, width, height, contours)
-        history, is_steady, sx, sy = utils.is_object_steady(nao.history, cx, cy)
 
+        # visual servoing and hand pose adaptation
+        if cv2.contourArea(contour) > 1000:
+            turn_yaw, turn_pitch, head_yaw, head_pitch = \
+                utils.head_controller(nao.motion_proxy, cx, cy, tol=tol)
+        else:
+            turn_yaw = False
+            turn_pitch = False
+            head_yaw = 0
+            head_pitch = 0
+
+        if turn_yaw or turn_pitch:
+            # print("the head is turning")
+            nao.head_rot = np.array([0, head_pitch, head_yaw])
+            nao.head_transform1 = utils.posor2tf(nao.head_pos0, nao.head_rot)
+            utils.set_tf(nao.motion_proxy, HEAD, utils.flat_tf(nao.head_transform1))  # head's visual servo
+        else:
+            head_yaw = nao.motion_proxy.getAngles(HEAD_YAW, True)[0]
+            head_pitch = nao.motion_proxy.getAngles(HEAD_PITCH, True)[0]
+            nao.head_rot = np.array([0, head_pitch, head_yaw])
+            T_h1 = utils.posor2tf(nao.head_pos0, nao.head_rot)
+            T_e1 = np.dot(np.dot(T_h1, np.linalg.inv(nao.head_transform0)), nao.hand_transform0)
+            utils.set_tf(nao.motion_proxy, R_ARM, utils.flat_tf(T_e1))  # hand's pose adaptation
+
+            # update values
+            nao.head_pose = nao.motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
+            nao.arm_pose = nao.motion_proxy.getPosition(R_ARM, motion.FRAME_TORSO, True)
+            tf_head = utils.pose2tf(nao.head_pose)
+            tf_arm = utils.pose2tf(nao.arm_pose)
+
+        # predict handover quality
         text = ""
         if score >= 0.9:
             x = features
             x = np.reshape(x, (1, -1))
-            y_pred = clf.predict(x)         # predict grasping quality
+            y_pred = clf.predict(x)
 
             if y_pred == 0:                 # bad handover
                 color = (0, 0, 255)
@@ -57,10 +93,10 @@ while True:
                 text = "good"
                 nao.open_hand(close=True)
                 nao.grasped_it = True
-                break
+                print("handover successful")
+                # break
 
-        # color = (255, 255, 0)
-        cv2.drawContours(frame, [box], 0, color, 2)  # draw detected object bounding box
+        cv2.drawContours(frame, [box], 0, color, 2)  # draw the bounding box of the detected object
         cv2.circle(frame, (cx, cy), 5, color, thickness=3)
         cv2.putText(frame, text, (np.int(cx), np.int(cy)), cv2.FONT_HERSHEY_COMPLEX_SMALL, 1, color, 2)
 
