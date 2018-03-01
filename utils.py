@@ -1,18 +1,13 @@
-import numpy as np
 import cv2
 import matplotlib.pyplot as plt
-import matplotlib.patches as mpatches
 import os
 from naoqi import ALProxy
 from naoqi import motion
 import vision_definitions as vd
 import Image
-from sklearn import svm, metrics, model_selection, neighbors, tree
 from scipy.stats import multivariate_normal
 from scipy import interpolate
 import almath
-import time
-import Queue
 from RobotConstants import *
 
 
@@ -51,6 +46,10 @@ def cam2numpy(video_proxy, subscriber):
 
 
 def color_range(color):
+    # red
+    lower = (0, 146, 118)
+    upper = (255, 255, 255)
+
     if color == "green":
         lower = (42, 42, 56)
         upper = (83, 255, 255)
@@ -80,7 +79,6 @@ def color_range(color):
     elif color == "red_cube":
         lower = (0, 156, 66)
         upper = (255, 255, 255)
-
     return lower, upper
 
 
@@ -127,17 +125,17 @@ def contour_features(contour):
         orientation = (90 - np.abs(angle))
 
     # rectangle corners
-    nw_x = cx - width / 2
-    nw_y = cy - height / 2
-
-    ne_x = cx + width / 2
-    ne_y = cy - height / 2
-
-    sw_x = cx - width / 2
-    sw_y = cy + height / 2
-
-    se_x = cx + width / 2
-    se_y = cy + height / 2
+    # nw_x = cx - width / 2
+    # nw_y = cy - height / 2
+    #
+    # ne_x = cx + width / 2
+    # ne_y = cy - height / 2
+    #
+    # sw_x = cx - width / 2
+    # sw_y = cy + height / 2
+    #
+    # se_x = cx + width / 2
+    # se_y = cy + height / 2
 
     # features vector
     features = [cx, cy, orientation, width, height]
@@ -152,12 +150,12 @@ def get_train_features(directory):
     # n_features = 13
 
     X = np.zeros((n_samples, n_features))
-    Y = np.zeros(n_samples, dtype=int)
+    y = np.zeros(n_samples, dtype=int)
     img_num = np.zeros(n_samples)
 
     for i in range(0, n_samples):
         img_name = files[i]
-        Y[i], img_num[i] = parse_filename(img_name)
+        y[i], img_num[i] = parse_filename(img_name)
 
         full_path = directory + img_name
         img = cv2.imread(full_path)
@@ -165,7 +163,7 @@ def get_train_features(directory):
         if found:
             X[i, :] = contour_features(contour)
 
-    return X, Y, img_num
+    return X, y, img_num
 
 
 def parse_filename(img_name):
@@ -379,18 +377,18 @@ def head_follow_marker(ip, port, x0, y0, cx, cy):
         head_yaw = head_yaw * almath.TO_RAD
         motion_proxy.setAngles(HEAD_YAW, head_yaw, head_speed)
 
-    # dy = (imageHeight / 2.0 - cy) / (imageHeight / 2)
-    # if np.abs(dy) >= 0.2:
-    #     K = 10
-    #     deltaPicth = K * dy
-    #     headPitch = motion_proxy.getAngles(headPitchName, False)[0] * almath.TO_DEG
-    #     headPitch -= deltaPicth
-    #
-    #     headPitch = np.min([headPitch, 20])
-    #     headPitch = np.max([headPitch, -30])
-    #
-    #     headPitchRad = headPitch * almath.TO_RAD
-    #     motion_proxy.setAngles(headPitchName, headPitchRad, head_speed)
+        # dy = (imageHeight / 2.0 - cy) / (imageHeight / 2)
+        # if np.abs(dy) >= 0.2:
+        #     K = 10
+        #     deltaPicth = K * dy
+        #     headPitch = motion_proxy.getAngles(headPitchName, False)[0] * almath.TO_DEG
+        #     headPitch -= deltaPicth
+        #
+        #     headPitch = np.min([headPitch, 20])
+        #     headPitch = np.max([headPitch, -30])
+        #
+        #     headPitchRad = headPitch * almath.TO_RAD
+        #     motion_proxy.setAngles(headPitchName, headPitchRad, head_speed)
 
 
 def get_object_contour2(img, color):
@@ -439,17 +437,17 @@ def set_tf(motion_proxy, chain, tf, speed=0.5):
 
 
 def euler2matrix(theta):
-    R_x = np.array([[1,         0,                 0                ],
-                    [0,         np.cos(theta[0]), -np.sin(theta[0]) ],
-                    [0,         np.sin(theta[0]),  np.cos(theta[0]) ]
+    R_x = np.array([[1, 0, 0],
+                    [0, np.cos(theta[0]), -np.sin(theta[0])],
+                    [0, np.sin(theta[0]), np.cos(theta[0])]
                     ])
-    R_y = np.array([[np.cos(theta[1]),    0,      np.sin(theta[1])  ],
-                    [0,                     1,    0                 ],
-                    [-np.sin(theta[1]),   0,      np.cos(theta[1])  ]
+    R_y = np.array([[np.cos(theta[1]), 0, np.sin(theta[1])],
+                    [0, 1, 0],
+                    [-np.sin(theta[1]), 0, np.cos(theta[1])]
                     ])
-    R_z = np.array([[np.cos(theta[2]),    -np.sin(theta[2]),    0],
-                    [np.sin(theta[2]),     np.cos(theta[2]),    0],
-                    [0,                     0,                  1]
+    R_z = np.array([[np.cos(theta[2]), -np.sin(theta[2]), 0],
+                    [np.sin(theta[2]), np.cos(theta[2]), 0],
+                    [0, 0, 1]
                     ])
     R = np.dot(R_z, np.dot(R_y, R_x))
     return R
@@ -509,7 +507,7 @@ def head_controller(motion_proxy, cx, cy, tol=0.2):
 
 
 def init_head(motion_proxy):
-    motion_proxy.setPosition(HEAD, motion.FRAME_TORSO, [0, 0, 0, 0, 20*almath.TO_RAD, 0], 0.5, AXIS_MASK_ALL)
+    motion_proxy.setPosition(HEAD, motion.FRAME_TORSO, [0, 0, 0, 0, 20 * almath.TO_RAD, 0], 0.5, AXIS_MASK_ALL)
 
 
 def init_arm2(motion_proxy):
