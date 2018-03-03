@@ -9,6 +9,7 @@ view of the robot's on-board camera.
 
 ### Robotic platform
 
+<a href="https://www.ald.softbankrobotics.com/en/robots/nao" target="_blank">NAO</a>
 Humanoid robot [NAO](https://www.ald.softbankrobotics.com/en/robots/nao){:target="_blank"}  
 * vision: monocular RGB camera
 * manipulator: 5-DOF arms, 1-DOF hands
