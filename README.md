@@ -27,7 +27,7 @@ The object detection is based on simple color-based segmentation:
 ### Classification
 The robot extracts visual geometric features of the object (centroid, width, height, orientation, etc)
 and based on training examples of good, average and bad handovers decides if it can grasp it.
-The classifier used in a Support Vector Machine with gaussian radial basis kernel.
+The classifier used is a Support Vector Machine with gaussian radial basis kernel.
 
 <img src="./images/conf_3c_b.png" width="40%">
 
