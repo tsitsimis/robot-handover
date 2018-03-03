@@ -7,9 +7,13 @@ view of the robot's on-board camera.
 
 ### Robotic platform
 
-Humanoid robot [NAO](https://www.ald.softbankrobotics.com/en/robots/nao)  
-* vision: monocular camera
+Humanoid robot [NAO](https://www.ald.softbankrobotics.com/en/robots/nao){target="_blank"}  
+* vision: monocular RGB camera
 * manipulator: 5-DOF arms, 1-DOF hands
+
+### Detection
+
+![detection_pipeline](./images/detection_pipeline.png)
 
 # Dependencies
 
