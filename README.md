@@ -15,6 +15,9 @@ Humanoid robot [NAO](https://www.ald.softbankrobotics.com/en/robots/nao){target=
 
 ![detection_pipeline](./images/detection_pipeline.png)
 
+* RGB $\rightarrow$ HSV
+* morphological filtering: $I \leftarrow (I \circ B) \bullet B$
+
 # Dependencies
 
 * numpy
