@@ -29,7 +29,7 @@ The robot extracts visual geometric features of the object (centroid, width, hei
 and based on training examples of good, average and bad handovers decides if it can grasp it.
 
 
-<img src="./images/conf_3c_b.png" width="50%">
+<img src="./images/conf_3c_b.png" width="20%">
 
 # Dependencies
 
