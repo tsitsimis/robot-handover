@@ -1,7 +1,7 @@
 # Interactive co-manipulation agent
 
 <img src="./images/handover_diagram.png" width="80%">
-<img src="./images/features_move.png" width="50%">
+<img src="./images/features_move.png" width="80%">
 
 A handover algorithm based on the detection of colored objects in the scene
 and on deciding about the robot’s ability to execute stable grasping.
