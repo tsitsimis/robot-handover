@@ -1,6 +1,6 @@
 # Interactive co-manipulation agent
 
-<img src="./images/nao.jpg" width="80%">
+<img src="./images/nao.jpg" width="50%">
 
 A handover algorithm based on the detection of colored objects in the scene
 and on deciding about the robot’s ability to execute stable grasping.
