@@ -27,9 +27,16 @@ The object detection is based on simple color-based segmentation:
 ### Classification
 The robot extracts visual geometric features of the object (centroid, width, height, orientation, etc)
 and based on training examples of good, average and bad handovers decides if it can grasp it.
+The classifier used in a Support Vector Machine with gaussian radial basis kernel.
 
+<img src="./images/conf_3c_b.png" width="40%">
 
-<img src="./images/conf_3c_b.png" width="20%">
+### Visual servoing
+The robot's head follows the object by adjusting its yaw and pitch angles through
+a simple proportional control. Given that the training samples were captures in a fixed head orientation
+the hand's pose must adapt to compensate the camera frame-hand frame change.
+
+<img src="./images/nao_frames.png" width="80%">
 
 # Dependencies
 
