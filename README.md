@@ -1,6 +1,6 @@
 # Interactive co-manipulation agent
 
-<img src="./images/nao.jpg" width="50%">
+<img src="./images/nao.jpg" width="30%">
 
 A handover algorithm based on the detection of colored objects in the scene
 and on deciding about the robot’s ability to execute stable grasping.
@@ -9,8 +9,7 @@ view of the robot's on-board camera.
 
 ### Robotic platform
 
-<a href="https://www.ald.softbankrobotics.com/en/robots/nao" target="_blank">NAO</a>
-Humanoid robot [NAO](https://www.ald.softbankrobotics.com/en/robots/nao){:target="_blank"}  
+Humanoid robot [NAO](https://www.ald.softbankrobotics.com/en/robots/nao)  
 * vision: monocular RGB camera
 * manipulator: 5-DOF arms, 1-DOF hands
 
