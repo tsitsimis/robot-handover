@@ -1,7 +1,6 @@
 # Interactive co-manipulation agent
 
-<img src="./images/handover_diagram.png" width="80%">
-<img src="./images/features_move.png" width="80%">
+<img src="./images/nao.jpg" width="80%">
 
 A handover algorithm based on the detection of colored objects in the scene
 and on deciding about the robot’s ability to execute stable grasping.
@@ -37,7 +36,7 @@ The robot's head follows the object by adjusting its yaw and pitch angles throug
 a simple proportional control. Given that the training samples were captures in a fixed head orientation
 the hand's pose must adapt to compensate the camera frame-hand frame change.
 
-<img src="./images/nao_frames.png" width="30%">
+<img src="./images/features_move.png" width="80%">
 
 # Dependencies
 
