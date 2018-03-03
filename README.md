@@ -31,7 +31,7 @@ The classifier used in a Support Vector Machine with gaussian radial basis kerne
 
 <img src="./images/conf_3c_b.png" width="40%">
 
-### Visual servoing
+### Visual servoing and end-effector adaptation
 The robot's head follows the object by adjusting its yaw and pitch angles through
 a simple proportional control. Given that the training samples were captures in a fixed head orientation
 the hand's pose must adapt to compensate the camera frame-hand frame change.
