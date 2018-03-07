@@ -25,7 +25,7 @@ nao.crouch()
 nao.init_head()
 nao.init_arm()
 nao.init_camera()
-time.sleep(5)
+time.sleep(3)
 
 nao.pose_head = nao.motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
 nao.arm_pose = nao.motion_proxy.getPosition(R_ARM, motion.FRAME_TORSO, True)
