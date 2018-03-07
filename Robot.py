@@ -5,6 +5,7 @@ from RobotConstants import *
 import Queue
 import Image
 import utils
+from timeit import default_timer as timer
 
 
 class Robot:
@@ -43,7 +44,7 @@ class Robot:
         Activates camera and checks if it has been already activated
         """
         cam_bottom = 0
-        fps = 12
+        fps = 5
         try:
             self.video_proxy.unsubscribe("demo")
             print("Robot: Camera unsubscribed")

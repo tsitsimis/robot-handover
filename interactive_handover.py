@@ -6,22 +6,24 @@ from Classifier import Classifier
 import time
 import cv2
 import utils
+import timeit
 
 
 # extract features and train classifier
-toy = "red_cylinder"
-toy_color = "red_cylinder"
+toy = "green"
+toy_color = "green"
 clf = Classifier("./samples/" + toy + "/", toy_color)
 clf.get_train_features()
 clf.fit()
 
 # initialize the robot
 ip_local = "192.168.1.18"
-ip_external = "192.168.0.121"
+# ip_external = "192.168.0.121"
+ip_external = "169.254.28.162"  # ethernet
 nao = Robot(ip=ip_external, port=9559)
-# nao.crouch()
+nao.crouch()
 nao.init_head()
-# nao.init_arm()
+nao.init_arm()
 nao.init_camera()
 time.sleep(5)
 

@@ -7,15 +7,16 @@ import utils
 
 
 # extract features and train classifier
-toy = "yellow_stairs"
-toy_color = "yellow_stairs"
+toy = "green"
+toy_color = "green"
 clf = Classifier("./samples/" + toy + "/", toy_color)
 clf.get_train_features()
 clf.fit()
 
 # initialize the robot
 ip_local = "192.168.1.18"
-ip_external = "192.168.0.121"
+# ip_external = "192.168.0.121"
+ip_external = "169.254.28.162"  # ethernet
 nao = Robot(ip=ip_external, port=9559)
 nao.crouch()
 nao.init_head()
