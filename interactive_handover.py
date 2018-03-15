@@ -31,7 +31,7 @@ nao.pose_head = nao.motion_proxy.getPosition(HEAD, motion.FRAME_TORSO, True)
 nao.arm_pose = nao.motion_proxy.getPosition(R_ARM, motion.FRAME_TORSO, True)
 tf_head = utils.pose2tf(nao.head_pose)
 tf_arm = utils.pose2tf(nao.arm_pose)
-tol = 0.85
+tol = 0.25
 
 # main loop
 while True:
@@ -59,11 +59,10 @@ while True:
             head_pitch = 0
 
         if turn_yaw or turn_pitch:
-            # print("the head is turning")
             nao.head_rot = np.array([0, head_pitch, head_yaw])
             nao.head_transform1 = utils.posor2tf(nao.head_pos0, nao.head_rot)
             utils.set_tf(nao.motion_proxy, HEAD, utils.flat_tf(nao.head_transform1))  # head's visual servo
-        else:
+        # else:
             head_yaw = nao.motion_proxy.getAngles(HEAD_YAW, True)[0]
             head_pitch = nao.motion_proxy.getAngles(HEAD_PITCH, True)[0]
             nao.head_rot = np.array([0, head_pitch, head_yaw])
@@ -96,7 +95,7 @@ while True:
                 nao.open_hand(close=True)
                 nao.grasped_it = True
                 print("handover successful")
-                # break
+                break
 
         cv2.drawContours(frame, [box], 0, color, 2)  # draw the bounding box of the detected object
         cv2.circle(frame, (cx, cy), 5, color, thickness=3)

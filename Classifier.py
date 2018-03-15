@@ -47,9 +47,14 @@ class Classifier:
         gamma_o = 1e-4
         C_o = 1
         clf = svm.SVC(kernel="rbf", gamma=gamma_o, C=C_o, probability=True)
-        # print(np.mean(model_selection.cross_val_score(clf, self.X, self.y, cv=10)))
         clf.fit(self.X, self.y)
         self.clf = clf
 
     def predict(self, X):
         return self.clf.predict(X)
+
+    def cross_val_score(self, k=10, mean=True):
+        scores = model_selection.cross_val_score(self.clf, self.X, self.y, cv=k)
+        if mean:
+            return np.mean(scores)
+        return scores
